@@ -1,4 +1,5 @@
-words = []
+pool_words = []
+shoot_word = null
 
 class ShootingWord
     constructor: (@full) ->
@@ -12,12 +13,16 @@ class ShootingWord
     shot: ->
         @remain = @remain.slice(1)
 
-words.push(new ShootingWord('kick neizod'))
+pool_words.push(new ShootingWord('kick neizod'))
+pool_words.push(new ShootingWord('punch neizod'))
+pool_words.push(new ShootingWord('strike neizod'))
 
 
 draw = ->
     $('#playground').empty()
-    for word in words
+    if shoot_word?
+        $('#playground').append(shoot_word.show())
+    for word in pool_words
         $('#playground').append(word.show())
 
 
@@ -26,6 +31,12 @@ $(document).ready ->
 
 $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
-    for word in words
-        if c == word.remain[0]
-            word.shot()
+    if not shoot_word?
+        for word, i in pool_words
+            if c == word.remain[0]
+                [shoot_word] = pool_words.splice(i, 1)
+                break
+
+    if c == shoot_word?.remain[0]
+        shoot_word.shot()
+        shoot_word = null if not shoot_word.remain
