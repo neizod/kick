@@ -9,8 +9,23 @@ class ShootingWord
         $('<div>').append($('<u>').html(done))
                   .append($('<b>').html(@remain))
 
+    shot: ->
+        @remain = @remain.slice(1)
+
 words.push(new ShootingWord('kick neizod'))
 
-$(document).ready ->
+
+draw = ->
+    $('#playground').empty()
     for word in words
         $('#playground').append(word.show())
+
+
+$(document).ready ->
+    setInterval(draw, 12)
+
+$(document).keypress (event) ->
+    c = String.fromCharCode(event.charCode)
+    for word in words
+        if c == word.remain[0]
+            word.shot()
