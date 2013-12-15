@@ -1,4 +1,5 @@
-Array::pop = (index=@length-1) -> this.splice(index, 1)[0]
+Array::pop = (index=@length-1) -> @splice(index, 1)[0]
+Array::random = -> @[Math.floor(@length * Math.random())]
 
 stage_height = 300
 stage_width = 1000
@@ -38,6 +39,8 @@ class ShootingWord
         @left <= 0
 
 
+action_words = ['box', 'kick', 'punch', 'strike']
+
 pool_words.push(new ShootingWord('kick neizod'))
 pool_words.push(new ShootingWord('punch neizod'))
 pool_words.push(new ShootingWord('strike neizod'))
@@ -70,4 +73,6 @@ $(document).keypress (event) ->
 
     if c == shoot_word?.remain[0]
         shoot_word.shot()
-        shoot_word = null if not shoot_word.remain
+    if not shoot_word.remain
+        shoot_word = null
+        pool_words.push(new ShootingWord("#{action_words.random()} neizod"))
