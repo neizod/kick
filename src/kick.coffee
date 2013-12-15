@@ -1,17 +1,40 @@
+stage_height = 300
+stage_width = 1000
+
 pool_words = []
 shoot_word = null
 
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
+        @top = stage_height * Math.random()
+        @left = stage_width - 100 # FIXME initial outside cause multiline
+        @show = @make_show()
 
-    show: ->
-        done = @full.slice(0, @full.length - @remain.length)
-        $('<div>').append($('<u>').html(done))
+    make_show: ->
+        $('<div>').addClass('shooting-word')
+                  .append($('<u>').html(@done()))
                   .append($('<b>').html(@remain))
+                  .css('top', @top)
+                  .css('left', @left)
+
+    done: ->
+        @full.slice(0, @full.length - @remain.length)
 
     shot: ->
         @remain = @remain.slice(1)
+
+    move: ->
+        @left -= 1 # TODO render smoother w/ word movement speed
+        @show.css('left', @left)
+
+    update: ->
+        @show.empty()
+             .append($('<u>').html(@done()))
+             .append($('<b>').html(@remain))
+
+    # TODO player die when word reach left side
+
 
 pool_words.push(new ShootingWord('kick neizod'))
 pool_words.push(new ShootingWord('punch neizod'))
@@ -21,9 +44,13 @@ pool_words.push(new ShootingWord('strike neizod'))
 draw = ->
     $('#playground').empty()
     if shoot_word?
-        $('#playground').append(shoot_word.show())
+        shoot_word.move()
+        shoot_word.update()
+        $('#playground').append(shoot_word.show)
     for word in pool_words
-        $('#playground').append(word.show())
+        word.move()
+        word.update()
+        $('#playground').append(word.show)
 
 
 $(document).ready ->

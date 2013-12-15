@@ -1,0 +1,10 @@
+#playground {
+    position: relative;
+    width: 1000px;
+    height: 300px;
+    background-color: lightblue;
+}
+
+.shooting-word {
+    position: absolute;
+}
