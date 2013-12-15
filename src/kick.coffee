@@ -3,6 +3,7 @@ stage_width = 1000
 
 pool_words = []
 shoot_word = null
+player_die = false
 
 class ShootingWord
     constructor: (@full) ->
@@ -32,8 +33,7 @@ class ShootingWord
         @show.empty()
              .append($('<u>').html(@done()))
              .append($('<b>').html(@remain))
-
-    # TODO player die when word reach left side
+        @left <= 0
 
 
 pool_words.push(new ShootingWord('kick neizod'))
@@ -45,12 +45,14 @@ draw = ->
     $('#playground').empty()
     if shoot_word?
         shoot_word.move()
-        shoot_word.update()
+        player_die = true if shoot_word.update()
         $('#playground').append(shoot_word.show)
     for word in pool_words
         word.move()
-        word.update()
+        player_die = true if word.update()
         $('#playground').append(word.show)
+    if player_die
+        $('#playground').css('background-color', 'darkred')
 
 
 $(document).ready ->
