@@ -1,3 +1,5 @@
+Array::pop = (index=@length-1) -> this.splice(index, 1)[0]
+
 stage_height = 300
 stage_width = 1000
 
@@ -63,7 +65,7 @@ $(document).keypress (event) ->
     if not shoot_word?
         for word, i in pool_words
             if c == word.remain[0]
-                [shoot_word] = pool_words.splice(i, 1)
+                shoot_word = pool_words.pop(i)
                 break
 
     if c == shoot_word?.remain[0]
