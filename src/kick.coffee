@@ -7,6 +7,7 @@ stage_width = 1000
 pool_words = []
 shoot_word = null
 
+lvl = 1
 point = 0
 player_die = false
 
@@ -44,9 +45,6 @@ class ShootingWord
 action_words = ['box', 'kick', 'punch', 'strike']
 
 pool_words.push(new ShootingWord('kick neizod'))
-pool_words.push(new ShootingWord('punch neizod'))
-pool_words.push(new ShootingWord('strike neizod'))
-
 
 draw = ->
     $('#point').html(point)
@@ -79,4 +77,6 @@ $(document).keypress (event) ->
     if shoot_word? and not shoot_word.remain
         point += shoot_word.full.length
         shoot_word = null
-        pool_words.push(new ShootingWord("#{action_words.random()} neizod"))
+        lvl += 1
+        for i in [1..lvl-pool_words.length]
+            pool_words.push(new ShootingWord("#{action_words.random()} neizod"))
