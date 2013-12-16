@@ -6,6 +6,8 @@ stage_width = 1000
 
 pool_words = []
 shoot_word = null
+
+point = 0
 player_die = false
 
 class ShootingWord
@@ -47,6 +49,7 @@ pool_words.push(new ShootingWord('strike neizod'))
 
 
 draw = ->
+    $('#point').html(point)
     $('#playground').empty()
     if shoot_word?
         shoot_word.move()
@@ -74,5 +77,6 @@ $(document).keypress (event) ->
     if c == shoot_word?.remain[0]
         shoot_word.shot()
     if shoot_word? and not shoot_word.remain
+        point += shoot_word.full.length
         shoot_word = null
         pool_words.push(new ShootingWord("#{action_words.random()} neizod"))
