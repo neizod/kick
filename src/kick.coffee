@@ -73,6 +73,6 @@ $(document).keypress (event) ->
 
     if c == shoot_word?.remain[0]
         shoot_word.shot()
-    if not shoot_word.remain
+    if shoot_word? and not shoot_word.remain
         shoot_word = null
         pool_words.push(new ShootingWord("#{action_words.random()} neizod"))
