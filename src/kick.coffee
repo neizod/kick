@@ -1,16 +1,30 @@
 Array::pop = (index=@length-1) -> @splice(index, 1)[0]
 Array::random = -> @[Math.floor(@length * Math.random())]
+Array::remove = (item) -> @pop(index) if (index = @indexOf(item)) > -1
 
 stage_height = 300
 stage_width = 1000
 
 pool_words = []
-keep_words = []
 shoot_word = null
 
 lvl = 1
 point = 0
 player_die = false
+
+inventory = new class Inventory
+    constructor: ->
+        @words = []
+
+    add: (word) ->
+        if word in @words
+            @words.remove(word)
+        else
+            @words.push(word)
+
+    show: ->
+        (word for word in @words).join(' ')
+
 
 class ShootingWord
     constructor: (@full) ->
@@ -52,7 +66,7 @@ pool_words.push(new ShootingWord('kick'))
 
 draw = ->
     $('#point').html(point)
-    $('#keep').html((word.full for word in keep_words).join(' '))
+    $('#keep').html(inventory.show())
     $('#playground').empty()
     if shoot_word?
         shoot_word.move()
@@ -87,7 +101,7 @@ $(document).keypress (event) ->
         shoot_word.shot()
     if shoot_word?.remain == ''
         point += shoot_word.full.length
-        keep_words.push(shoot_word)
+        inventory.add(shoot_word.full)
         shoot_word = null
         lvl += 1
         for i in [1..lvl-pool_words.length]
