@@ -42,6 +42,9 @@ class ShootingWord
              .append($('<b>').html(@remain))
         @left <= 0
 
+    reset: ->
+        @remain = @full
+
 
 action_words = ['box', 'kick', 'punch', 'strike']
 
@@ -66,6 +69,13 @@ draw = ->
 $(document).ready ->
     setInterval(draw, 12)
 
+$(document).keydown (event) ->
+    if event.keyCode in [8, 27, 46] # backspace, escape, delete
+        if shoot_word?
+            shoot_word.reset()
+            pool_words.push(shoot_word)
+            shoot_word = null
+
 $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
     if not shoot_word?
@@ -73,10 +83,9 @@ $(document).keypress (event) ->
             if c == word.remain[0]
                 shoot_word = pool_words.pop(i)
                 break
-
     if c == shoot_word?.remain[0]
         shoot_word.shot()
-    if shoot_word? and not shoot_word.remain
+    if shoot_word?.remain == ''
         point += shoot_word.full.length
         keep_words.push(shoot_word)
         shoot_word = null
