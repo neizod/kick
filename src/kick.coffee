@@ -7,6 +7,7 @@ stage_width = 1000
 
 pool_words = []
 shoot_word = null
+shoot_name = null
 
 lvl = 1
 point = 0
@@ -17,13 +18,20 @@ inventory = new class Inventory
         @words = []
 
     add: (word) ->
-        if word in @words
+        if word == shoot_name?.full
+            @words = []
+        else if word in @words
             @words.remove(word)
         else
             @words.push(word)
+        if not @words.length
+            shoot_name = null
+        else
+            shoot_name = new ShootingWord('@neizod')
 
     show: ->
-        (word for word in @words).join(' ')
+        follow = if shoot_name? then ' ' + shoot_name.show.html() else ''
+        (word for word in @words).join(' ') + follow
 
 
 class ShootingWord
@@ -69,9 +77,12 @@ draw = ->
     $('#keep').html(inventory.show())
     $('#playground').empty()
     if shoot_word?
-        shoot_word.move()
-        player_die = true if shoot_word.update()
-        $('#playground').append(shoot_word.show)
+        if shoot_word.full == shoot_name?.full
+            shoot_word.update()
+        else
+            shoot_word.move()
+            player_die = true if shoot_word.update()
+            $('#playground').append(shoot_word.show)
     for word in pool_words
         word.move()
         player_die = true if word.update()
@@ -97,6 +108,9 @@ $(document).keypress (event) ->
             if c == word.remain[0]
                 shoot_word = pool_words.pop(i)
                 break
+    if not shoot_word? and shoot_name?
+        if c == shoot_name.remain[0]
+            shoot_word = shoot_name
     if c == shoot_word?.remain[0]
         shoot_word.shot()
     if shoot_word?.remain == ''
