@@ -5,6 +5,7 @@ Array::remove = (item) -> @pop(index) if (index = @indexOf(item)) > -1
 stage_height = 300
 stage_width = 1000
 
+animate_id = null
 pool_words = []
 shoot_word = null
 shoot_name = null
@@ -88,13 +89,15 @@ draw = ->
         player_die = true if word.update()
         $('#playground').append(word.show)
     if player_die
+        clearInterval(animate_id)
+        animate_id = null
         $('#playground').css('background-color', 'darkred')
 
 
-$(document).ready ->
-    setInterval(draw, 12)
-
 $(document).keydown (event) ->
+    if event.keyCode == 13 # enter
+        if not animate_id?
+            animate_id = setInterval(draw, 12)
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
         if shoot_word?
             shoot_word.reset()
