@@ -6,12 +6,16 @@ stage_height = 300
 stage_width = 1000
 
 animate_id = null
-shoot_word = null
 shoot_name = null
 
-lvl = 1
-point = 0
-player_die = false
+
+player = new class Player
+    constructor: ->
+        @lvl = 1
+        @point = 0
+        @die = false
+        @word = null
+
 
 pool_words = new class PoolWord
     constructor: ->
@@ -43,6 +47,7 @@ pool_words = new class PoolWord
     draw: ->
         for word in @words
             $('#playground').append(word.show)
+
 
 inventory = new class Inventory
     constructor: ->
@@ -102,20 +107,20 @@ class ShootingWord
 pool_words.add('kick')
 
 draw = ->
-    $('#point').html(point)
+    $('#point').html(player.point)
     $('#keep').html(inventory.show())
     $('#playground').empty()
-    if shoot_word?
-        if shoot_word.full == shoot_name?.full
-            shoot_word.update()
+    if player.word?
+        if player.word.full == shoot_name?.full
+            player.word.update()
         else
-            shoot_word.move()
-            player_die = true if shoot_word.update()
-            $('#playground').append(shoot_word.show)
+            player.word.move()
+            player.die = true if player.word.update()
+            $('#playground').append(player.word.show)
     pool_words.move()
-    player_die = true if pool_words.attack()
+    player.die = true if pool_words.attack()
     pool_words.draw()
-    if player_die
+    if player.die
         clearInterval(animate_id)
         animate_id = null
         $('#playground').css('background-color', 'darkred')
@@ -126,23 +131,23 @@ $(document).keydown (event) ->
         if not animate_id?
             animate_id = setInterval(draw, 12)
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
-        if shoot_word?
-            shoot_word.reset()
-            pool_words.add(shoot_word.full)
-            shoot_word = null
+        if player.word?
+            player.word.reset()
+            pool_words.add(player.word.full)
+            player.word = null
 
 $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
-    if not shoot_word?
-        shoot_word = pool_words.get(c)
-    if not shoot_word? and shoot_name?
+    if not player.word?
+        player.word = pool_words.get(c)
+    if not player.word? and shoot_name?
         if c == shoot_name.remain[0]
-            shoot_word = shoot_name
-    if c == shoot_word?.remain[0]
-        shoot_word.shot()
-    if shoot_word?.remain == ''
-        point += shoot_word.full.length
-        inventory.add(shoot_word.full)
-        shoot_word = null
-        lvl += 1
-        pool_words.autofill(lvl)
+            player.word = shoot_name
+    if c == player.word?.remain[0]
+        player.word.shot()
+    if player.word?.remain == ''
+        player.point += player.word.full.length
+        inventory.add(player.word.full)
+        player.word = null
+        player.lvl += 1
+        pool_words.autofill(player.lvl)
