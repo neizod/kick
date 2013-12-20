@@ -5,9 +5,6 @@ Array::remove = (item) -> @pop(index) if (index = @indexOf(item)) > -1
 stage_height = 300
 stage_width = 1000
 
-animate_id = null
-shoot_name = null
-
 
 player = new class Player
     constructor: ->
@@ -15,6 +12,8 @@ player = new class Player
         @point = 0
         @die = false
         @word = null
+        @game = null
+        @longest = []
 
 
 pool_words = new class PoolWord
@@ -52,21 +51,24 @@ pool_words = new class PoolWord
 inventory = new class Inventory
     constructor: ->
         @words = []
+        @name = null
 
     add: (word) ->
-        if word == shoot_name?.full
+        if word == @name?.full
+            if @words.length >= player.longest.length
+                player.longest = @words
             @words = []
         else if word in @words
             @words.remove(word)
         else
             @words.push(word)
         if not @words.length
-            shoot_name = null
+            @name = null
         else
-            shoot_name = new ShootingWord('@neizod')
+            @name = new ShootingWord('@neizod')
 
     show: ->
-        follow = if shoot_name? then ' ' + shoot_name.show.html() else ''
+        follow = if @name? then ' ' + @name.show.html() else ''
         (word for word in @words).join(' ') + follow
 
 
@@ -111,7 +113,7 @@ draw = ->
     $('#keep').html(inventory.show())
     $('#playground').empty()
     if player.word?
-        if player.word.full == shoot_name?.full
+        if player.word.full == inventory.name?.full
             player.word.update()
         else
             player.word.move()
@@ -121,15 +123,15 @@ draw = ->
     player.die = true if pool_words.attack()
     pool_words.draw()
     if player.die
-        clearInterval(animate_id)
-        animate_id = null
+        clearInterval(player.game)
+        player.game = null
         $('#playground').css('background-color', 'darkred')
 
 
 $(document).keydown (event) ->
     if event.keyCode == 13 # enter
-        if not animate_id?
-            animate_id = setInterval(draw, 12)
+        if not player.game?
+            player.game = setInterval(draw, 12)
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
         if player.word?
             player.word.reset()
@@ -140,9 +142,9 @@ $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
     if not player.word?
         player.word = pool_words.get(c)
-    if not player.word? and shoot_name?
-        if c == shoot_name.remain[0]
-            player.word = shoot_name
+    if not player.word? and inventory.name?
+        if c == inventory.name.remain[0]
+            player.word = inventory.name
     if c == player.word?.remain[0]
         player.word.shot()
     if player.word?.remain == ''
