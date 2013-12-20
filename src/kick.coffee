@@ -6,13 +6,43 @@ stage_height = 300
 stage_width = 1000
 
 animate_id = null
-pool_words = []
 shoot_word = null
 shoot_name = null
 
 lvl = 1
 point = 0
 player_die = false
+
+pool_words = new class PoolWord
+    constructor: ->
+        @words = []
+        @actions = ['box', 'kick', 'punch', 'strike']
+
+    add: (word=null) ->
+        if not word?
+            word = @actions.random()
+        @words.push(new ShootingWord(word))
+
+    autofill: (lvl) ->
+        for [1..lvl-@words.length]
+            pool_words.add()
+
+    get: (c) ->
+        for word, i in @words
+            if c == word.remain[0]
+                return @words.pop(i)
+
+    move: ->
+        for word in @words
+            word.move()
+            word.update()
+
+    attack: ->
+        @words.some (word) -> word.left <= 0
+
+    draw: ->
+        for word in @words
+            $('#playground').append(word.show)
 
 inventory = new class Inventory
     constructor: ->
@@ -69,9 +99,7 @@ class ShootingWord
         @remain = @full
 
 
-action_words = ['box', 'kick', 'punch', 'strike']
-
-pool_words.push(new ShootingWord('kick'))
+pool_words.add('kick')
 
 draw = ->
     $('#point').html(point)
@@ -84,10 +112,9 @@ draw = ->
             shoot_word.move()
             player_die = true if shoot_word.update()
             $('#playground').append(shoot_word.show)
-    for word in pool_words
-        word.move()
-        player_die = true if word.update()
-        $('#playground').append(word.show)
+    pool_words.move()
+    player_die = true if pool_words.attack()
+    pool_words.draw()
     if player_die
         clearInterval(animate_id)
         animate_id = null
@@ -101,16 +128,13 @@ $(document).keydown (event) ->
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
         if shoot_word?
             shoot_word.reset()
-            pool_words.push(shoot_word)
+            pool_words.add(shoot_word.full)
             shoot_word = null
 
 $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
     if not shoot_word?
-        for word, i in pool_words
-            if c == word.remain[0]
-                shoot_word = pool_words.pop(i)
-                break
+        shoot_word = pool_words.get(c)
     if not shoot_word? and shoot_name?
         if c == shoot_name.remain[0]
             shoot_word = shoot_name
@@ -121,5 +145,4 @@ $(document).keypress (event) ->
         inventory.add(shoot_word.full)
         shoot_word = null
         lvl += 1
-        for i in [1..lvl-pool_words.length]
-            pool_words.push(new ShootingWord(action_words.random()))
+        pool_words.autofill(lvl)
