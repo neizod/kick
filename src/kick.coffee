@@ -33,12 +33,15 @@ pool_words = new class PoolWord
     get: (c) ->
         for word, i in @words
             if c == word.remain[0]
-                return @words.pop(i)
+                return @words[i]
 
     move: ->
         for word in @words
             word.move()
             word.update()
+
+    update: ->
+        @words = (word for word in @words when word.remain)
 
     attack: ->
         @words.some (word) -> word.left <= 0
@@ -115,10 +118,6 @@ draw = ->
     if player.word?
         if player.word.full == inventory.name?.full
             player.word.update()
-        else
-            player.word.move()
-            player.die = true if player.word.update()
-            $('#playground').append(player.word.show)
     pool_words.move()
     player.die = true if pool_words.attack()
     pool_words.draw()
@@ -150,6 +149,7 @@ $(document).keypress (event) ->
     if player.word?.remain == ''
         player.point += player.word.full.length
         inventory.add(player.word.full)
+        pool_words.update()
         player.word = null
         player.lvl += 1
         pool_words.autofill(player.lvl)
