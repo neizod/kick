@@ -1,6 +1,5 @@
 Array::pop = (index=@length-1) -> @splice(index, 1)[0]
 Array::random = -> @[Math.floor(@length * Math.random())]
-Array::remove = (item) -> @pop(index) if (index = @indexOf(item)) > -1
 
 stage_height = 300
 stage_width = 1000
@@ -57,12 +56,12 @@ inventory = new class Inventory
         @name = null
 
     add: (word) ->
-        if word == @name?.full
+        if word.full == @name?.full
             if @words.length >= player.longest.length
                 player.longest = @words
             @words = []
-        else if word in @words
-            @words.remove(word)
+        else if (index = @index(word))?
+            @words.pop(index)
         else
             @words.push(word)
         if not @words.length
@@ -70,9 +69,15 @@ inventory = new class Inventory
         else
             @name = new ShootingWord('@neizod')
 
+    index: (find) ->
+        for word, i in @words
+            if word.full == find.full
+                return i
+
     show: ->
-        follow = if @name? then ' ' + @name.show.html() else ''
-        (word for word in @words).join(' ') + follow
+        sentence = @words.concat(if @name? then [@name] else [])
+        (word.show.html() for word in sentence).join(' ')
+
 
 
 class ShootingWord
@@ -92,8 +97,9 @@ class ShootingWord
     done: ->
         @full.slice(0, @full.length - @remain.length)
 
-    shot: ->
-        @remain = @remain.slice(1)
+    shot: (c) ->
+        if c == @remain[0]
+            @remain = @remain.slice(1)
 
     move: ->
         @left -= 1 # TODO render smoother w/ word movement speed
@@ -115,9 +121,7 @@ draw = ->
     $('#point').html(player.point)
     $('#keep').html(inventory.show())
     $('#playground').empty()
-    if player.word?
-        if player.word.full == inventory.name?.full
-            player.word.update()
+    player.word?.update()
     pool_words.move()
     player.die = true if pool_words.attack()
     pool_words.draw()
@@ -134,7 +138,7 @@ $(document).keydown (event) ->
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
         if player.word?
             player.word.reset()
-            pool_words.add(player.word.full)
+            player.word.update()
             player.word = null
 
 $(document).keypress (event) ->
@@ -144,12 +148,13 @@ $(document).keypress (event) ->
     if not player.word? and inventory.name?
         if c == inventory.name.remain[0]
             player.word = inventory.name
-    if c == player.word?.remain[0]
-        player.word.shot()
+    player.word?.shot(c)
     if player.word?.remain == ''
         player.point += player.word.full.length
-        inventory.add(player.word.full)
+        inventory.add(player.word)
         pool_words.update()
+        player.word.reset()
+        player.word.update()
         player.word = null
         player.lvl += 1
         pool_words.autofill(player.lvl)
