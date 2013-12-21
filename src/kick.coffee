@@ -133,14 +133,18 @@ draw = ->
     pool_words.draw()
     if player.die
         clearInterval(player.game)
-        player.game = null
         $('#playground').css('background-color', 'darkred')
+        player.constructor()
+        inventory.constructor()
+        pool_words.constructor()
+        pool_words.autofill()
 
 
 $(document).keydown (event) ->
     if event.keyCode == 13 # enter
         if not player.game?
             player.game = setInterval(draw, 12)
+            $('#playground').css('background-color', 'lightblue')
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
         player.word?.reset()
         player.word = null
