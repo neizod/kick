@@ -20,13 +20,11 @@ pool_words = new class PoolWord
         @words = []
         @actions = ['box', 'kick', 'punch', 'strike']
 
-    add: (word=null) ->
-        if not word?
-            word = @actions.random()
+    add: (word=@actions.random()) ->
         @words.push(new ShootingWord(word))
 
-    autofill: (lvl) ->
-        for [1..lvl-@words.length]
+    autofill: ->
+        for [1..player.lvl-@words.length]
             pool_words.add()
 
     get: (c) ->
@@ -37,7 +35,6 @@ pool_words = new class PoolWord
     move: ->
         for word in @words
             word.move()
-            word.update()
 
     update: ->
         @words = (word for word in @words when word.remain)
@@ -104,12 +101,12 @@ class ShootingWord
     move: ->
         @left -= 1 # TODO render smoother w/ word movement speed
         @show.css('left', @left)
+        @update()
 
     update: ->
         @show.empty()
              .append($('<u>').html(@done()))
              .append($('<b>').html(@remain))
-        @left <= 0
 
     reset: ->
         @remain = @full
