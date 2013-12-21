@@ -11,6 +11,7 @@ player = new class Player
         @point = 0
         @die = false
         @word = null
+        @pair = null
         @game = null
         @longest = []
 
@@ -44,7 +45,7 @@ pool_words = new class PoolWord
 
     draw: ->
         for word in @words
-            $('#playground').append(word.show)
+            $('#playground').append(word.repr)
 
 
 inventory = new class Inventory
@@ -66,6 +67,11 @@ inventory = new class Inventory
         else
             @name = new ShootingWord('@neizod')
 
+    get: (fullword) ->
+        for word, i in @words
+            if fullword == word.full
+                return @words[i]
+
     index: (find) ->
         for word, i in @words
             if word.full == find.full
@@ -73,7 +79,7 @@ inventory = new class Inventory
 
     show: ->
         sentence = @words.concat(if @name? then [@name] else [])
-        (word.show.html() for word in sentence).join(' ')
+        (word.repr.html() for word in sentence).join(' ')
 
 
 
@@ -82,12 +88,11 @@ class ShootingWord
         @remain = @full
         @top = stage_height * Math.random()
         @left = stage_width - 100 # FIXME initial outside cause multiline
-        @show = @make_show()
+        @repr = @make_repr()
+        @update()
 
-    make_show: ->
+    make_repr: ->
         $('<div>').addClass('shooting-word')
-                  .append($('<u>').html(@done()))
-                  .append($('<b>').html(@remain))
                   .css('top', @top)
                   .css('left', @left)
 
@@ -97,19 +102,23 @@ class ShootingWord
     shot: (c) ->
         if c == @remain[0]
             @remain = @remain.slice(1)
+        @update()
 
     move: ->
         @left -= 1 # TODO render smoother w/ word movement speed
-        @show.css('left', @left)
-        @update()
+        @repr.css('left', @left)
 
     update: ->
-        @show.empty()
-             .append($('<u>').html(@done()))
-             .append($('<b>').html(@remain))
+        if @remain == @full
+            @repr.html($('<b>').html(@full))
+        else
+            @repr.empty()
+                 .append($('<u>').html(@done()))
+                 .append($('<b>').html(@remain))
 
     reset: ->
         @remain = @full
+        @update()
 
 
 pool_words.add('kick')
@@ -133,10 +142,10 @@ $(document).keydown (event) ->
         if not player.game?
             player.game = setInterval(draw, 12)
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
-        if player.word?
-            player.word.reset()
-            player.word.update()
-            player.word = null
+        player.word?.reset()
+        player.word = null
+        player.pair?.reset()
+        player.pair = null
 
 $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
@@ -145,13 +154,18 @@ $(document).keypress (event) ->
     if not player.word? and inventory.name?
         if c == inventory.name.remain[0]
             player.word = inventory.name
+    if player.word?
+        if player.word.full == player.word.remain
+            player.pair = inventory.get(player.word.full)
     player.word?.shot(c)
+    player.pair?.shot(c)
     if player.word?.remain == ''
         player.point += player.word.full.length
         inventory.add(player.word)
         pool_words.update()
         player.word.reset()
-        player.word.update()
         player.word = null
         player.lvl += 1
-        pool_words.autofill(player.lvl)
+        pool_words.autofill()
+    if player.pair?.remain == ''
+        player.pair = null
