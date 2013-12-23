@@ -5,6 +5,24 @@ stage_height = 300
 stage_width = 1000
 
 
+fps = new class FramesPerSecond
+    constructor: ->
+        @frames = 20
+        @time = 0
+        @date = new Date()
+
+    loop: ->
+        now = new Date()
+        @time += (now - @date - @time) / @frames
+        @date = now
+
+    rate: ->
+        1000 / @time
+
+    show: ->
+        @rate().toFixed(1) + ' fps'
+
+
 player = new class Player
     constructor: ->
         @lvl = 1
@@ -124,6 +142,8 @@ class ShootingWord
 pool_words.add('kick')
 
 draw = ->
+    fps.loop()
+    $('#fps').html(fps.show())
     $('#point').html(player.point)
     $('#keep').html(inventory.show())
     $('#playground').empty()
