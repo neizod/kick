@@ -3,6 +3,7 @@ Array::random = -> @[Math.floor(@length * Math.random())]
 
 stage_height = 300
 stage_width = 1000
+font_height = 18
 
 
 fps = new class
@@ -33,8 +34,13 @@ player = new class
         @game = null
         @longest = []
 
+    reset: ->
+        @word?.reset()
+        @word = null
+        @pair?.reset()
+        @pair = null
 
-pool_words = new class
+pool = new class
     constructor: ->
         @words = []
         @actions = ['box', 'kick', 'punch', 'strike']
@@ -44,14 +50,14 @@ pool_words = new class
 
     autofill: ->
         for [1..player.lvl-@words.length]
-            pool_words.add()
+            @add()
 
     get: (c) ->
         for word, i in @words
             if c == word.remain[0]
                 return @words[i]
 
-    move: ->
+    loop: ->
         for word in @words
             word.move()
 
@@ -60,10 +66,6 @@ pool_words = new class
 
     attack: ->
         @words.some (word) -> word.left <= 0
-
-    draw: ->
-        for word in @words
-            $('#playground').append(word.repr)
 
 
 inventory = new class
@@ -90,6 +92,10 @@ inventory = new class
             if fullword == word.full
                 return @words[i]
 
+    get_name: (c) ->
+        if c == @name?.remain[0]
+            return @name
+
     index: (find) ->
         for word, i in @words
             if word.full == find.full
@@ -104,8 +110,8 @@ inventory = new class
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
-        @top = stage_height * Math.random()
-        @left = stage_width - 100 # FIXME initial outside cause multiline
+        @top = (stage_height - font_height) * Math.random()
+        @left = stage_width
         @repr = @make_repr()
         @update()
 
@@ -130,54 +136,63 @@ class ShootingWord
         if @remain == @full
             @repr.html($('<b>').html(@full))
         else
-            @repr.empty()
-                 .append($('<u>').html(@done()))
-                 .append($('<b>').html(@remain))
+            @repr.html([$('<u>').html(@done()), $('<b>').html(@remain)])
 
     reset: ->
         @remain = @full
         @update()
 
 
-pool_words.add('kick')
 
-draw = ->
-    fps.loop()
-    $('#fps').html(fps.show())
-    $('#point').html(player.point)
-    $('#keep').html(inventory.show())
-    $('#playground').empty()
-    player.word?.update()
-    pool_words.move()
-    player.die = true if pool_words.attack()
-    pool_words.draw()
-    if player.die
-        clearInterval(player.game)
+
+animate = new class
+    constructor: ->
+        @id = null
+
+    start: ->
+        @id = setInterval(@loop, 12)
+        $('#playground').css('background-color', 'lightblue')
+
+    stop: ->
+        clearInterval(@id)
         $('#playground').css('background-color', 'darkred')
-        player.constructor()
-        inventory.constructor()
-        pool_words.constructor()
-        pool_words.autofill()
+
+    reset: ->
+        @id = null
+        for reinit_object in [player, inventory, pool]
+            reinit_object.constructor()
+        pool.autofill()
+
+    loop: =>
+        fps.loop()
+        pool.loop()
+        $('#fps').html(fps.show())
+        $('#point').html(player.point)
+        $('#keep').html(inventory.show())
+        $('#playground').html(word.repr for word in pool.words)
+        player.die = true if pool.attack()
+        if player.die
+            @stop()
+            @reset()
 
 
 $(document).keydown (event) ->
     if event.keyCode == 13 # enter
-        if not player.game?
-            player.game = setInterval(draw, 12)
-            $('#playground').css('background-color', 'lightblue')
+        if not animate.id?
+            animate.start()
+            if animate.id == 1
+                pool.words = []
+                pool.add('kick')
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
-        player.word?.reset()
-        player.word = null
-        player.pair?.reset()
-        player.pair = null
+        player.reset()
+
 
 $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
     if not player.word?
-        player.word = pool_words.get(c)
-    if not player.word? and inventory.name?
-        if c == inventory.name.remain[0]
-            player.word = inventory.name
+        player.word = pool.get(c)
+    if not player.word?
+        player.word = inventory.get_name(c)
     if player.word?
         if player.word.full == player.word.remain
             player.pair = inventory.get(player.word.full)
@@ -186,10 +201,10 @@ $(document).keypress (event) ->
     if player.word?.remain == ''
         player.point += player.word.full.length
         inventory.add(player.word)
-        pool_words.update()
+        pool.update()
         player.word.reset()
         player.word = null
         player.lvl += 1
-        pool_words.autofill()
+        pool.autofill()
     if player.pair?.remain == ''
         player.pair = null
