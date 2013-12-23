@@ -9,6 +9,7 @@ font_height = 18
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
+        @speed = 80
         @top = (stage_height - font_height) * Math.random()
         @left = stage_width
         @repr = @make_repr()
@@ -28,7 +29,7 @@ class ShootingWord
         @update()
 
     move: ->
-        @left -= 1 # TODO render smoother w/ word movement speed
+        @left -= @speed / fps.rate()
         @repr.css('left', @left)
 
     update: ->
@@ -45,12 +46,15 @@ class ShootingWord
 fps = new class
     constructor: ->
         @frames = 20
+        @actual = 0
         @time = 0
         @date = new Date()
 
     loop: ->
+        if @actual != @frames
+            @actual += 1
         now = new Date()
-        @time += (now - @date - @time) / @frames
+        @time += (now - @date - @time) / @actual
         @date = now
 
     rate: ->
@@ -67,7 +71,6 @@ player = new class
         @die = false
         @word = null
         @pair = null
-        @game = null
         @longest = []
 
     reset: ->
@@ -104,6 +107,11 @@ pool = new class
 
     attack: ->
         @words.some (word) -> word.left <= 0
+
+    easter_egg: ->
+        if animate.id == 1
+            @words = []
+            @add('kick')
 
 
 inventory = new class
@@ -149,6 +157,7 @@ animate = new class
         @id = null
 
     start: ->
+        fps.constructor()
         @id = setInterval(@loop, 12)
         $('#playground').css('background-color', 'lightblue')
 
@@ -178,9 +187,7 @@ $(document).keydown (event) ->
     if event.keyCode == 13 # enter
         if not animate.id?
             animate.start()
-            if animate.id == 1
-                pool.words = []
-                pool.add('kick')
+            pool.easter_egg()
     if event.keyCode in [8, 27, 46] # backspace, escape, delete
         player.reset()
 
