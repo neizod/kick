@@ -5,7 +5,7 @@ stage_height = 300
 stage_width = 1000
 
 
-fps = new class FramesPerSecond
+fps = new class
     constructor: ->
         @frames = 20
         @time = 0
@@ -23,7 +23,7 @@ fps = new class FramesPerSecond
         @rate().toFixed(1) + ' fps'
 
 
-player = new class Player
+player = new class
     constructor: ->
         @lvl = 1
         @point = 0
@@ -34,7 +34,7 @@ player = new class Player
         @longest = []
 
 
-pool_words = new class PoolWord
+pool_words = new class
     constructor: ->
         @words = []
         @actions = ['box', 'kick', 'punch', 'strike']
@@ -66,7 +66,7 @@ pool_words = new class PoolWord
             $('#playground').append(word.repr)
 
 
-inventory = new class Inventory
+inventory = new class
     constructor: ->
         @words = []
         @name = null
