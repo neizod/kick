@@ -6,6 +6,42 @@ stage_width = 1000
 font_height = 18
 
 
+class ShootingWord
+    constructor: (@full) ->
+        @remain = @full
+        @top = (stage_height - font_height) * Math.random()
+        @left = stage_width
+        @repr = @make_repr()
+        @update()
+
+    make_repr: ->
+        $('<div>').addClass('shooting-word')
+                  .css('top', @top)
+                  .css('left', @left)
+
+    done: ->
+        @full.slice(0, @full.length - @remain.length)
+
+    shot: (c) ->
+        if c == @remain[0]
+            @remain = @remain.slice(1)
+        @update()
+
+    move: ->
+        @left -= 1 # TODO render smoother w/ word movement speed
+        @repr.css('left', @left)
+
+    update: ->
+        if @remain == @full
+            @repr.html($('<b>').html(@full))
+        else
+            @repr.html([$('<u>').html(@done()), $('<b>').html(@remain)])
+
+    reset: ->
+        @remain = @full
+        @update()
+
+
 fps = new class
     constructor: ->
         @frames = 20
@@ -40,10 +76,12 @@ player = new class
         @pair?.reset()
         @pair = null
 
+
 pool = new class
     constructor: ->
         @words = []
         @actions = ['box', 'kick', 'punch', 'strike']
+        @autofill()
 
     add: (word=@actions.random()) ->
         @words.push(new ShootingWord(word))
@@ -106,45 +144,6 @@ inventory = new class
         (word.repr.html() for word in sentence).join(' ')
 
 
-
-class ShootingWord
-    constructor: (@full) ->
-        @remain = @full
-        @top = (stage_height - font_height) * Math.random()
-        @left = stage_width
-        @repr = @make_repr()
-        @update()
-
-    make_repr: ->
-        $('<div>').addClass('shooting-word')
-                  .css('top', @top)
-                  .css('left', @left)
-
-    done: ->
-        @full.slice(0, @full.length - @remain.length)
-
-    shot: (c) ->
-        if c == @remain[0]
-            @remain = @remain.slice(1)
-        @update()
-
-    move: ->
-        @left -= 1 # TODO render smoother w/ word movement speed
-        @repr.css('left', @left)
-
-    update: ->
-        if @remain == @full
-            @repr.html($('<b>').html(@full))
-        else
-            @repr.html([$('<u>').html(@done()), $('<b>').html(@remain)])
-
-    reset: ->
-        @remain = @full
-        @update()
-
-
-
-
 animate = new class
     constructor: ->
         @id = null
@@ -161,7 +160,6 @@ animate = new class
         @id = null
         for reinit_object in [player, inventory, pool]
             reinit_object.constructor()
-        pool.autofill()
 
     loop: =>
         fps.loop()
