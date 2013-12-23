@@ -67,7 +67,7 @@ fps = new class
 player = new class
     constructor: ->
         @lvl = 1
-        @point = 0
+        @score = 0
         @die = false
         @word = null
         @pair = null
@@ -79,8 +79,41 @@ player = new class
         @pair?.reset()
         @pair = null
 
+    shoot: (c) ->
+        @word?.shot(c) and @pair?.shot(c)
+        if @word?.remain == ''
+            pool.remove(@word)
+            if @word.full == inventory.name?.full
+                @score += inventory.scoring()
+                inventory.clear()
+            else if not @pair?
+                inventory.add(@word)
+            else
+                inventory.remove(@word)
+            pool.autofill()
+            @lvl += 1
+            @word = null
+            @pair = null
 
-pool = new class
+
+class WordKeeper
+    get: (str) ->
+        for word, i in @words
+            comparator = if str.length == 1 then word.remain[0] else word.full
+            if str == comparator
+                return @words[i]
+
+    remove: (word) ->
+        if (index = @index(word))?
+            @words.pop(index)
+
+    index: (find) ->
+        for word, i in @words
+            if word.full == find.full
+                return i
+
+
+pool = new class extends WordKeeper
     constructor: ->
         @words = []
         @actions = ['box', 'kick', 'punch', 'strike']
@@ -93,17 +126,9 @@ pool = new class
         for [1..player.lvl-@words.length]
             @add()
 
-    get: (c) ->
-        for word, i in @words
-            if c == word.remain[0]
-                return @words[i]
-
     loop: ->
         for word in @words
             word.move()
-
-    update: ->
-        @words = (word for word in @words when word.remain)
 
     attack: ->
         @words.some (word) -> word.left <= 0
@@ -114,38 +139,37 @@ pool = new class
             @add('kick')
 
 
-inventory = new class
+inventory = new class extends WordKeeper
     constructor: ->
         @words = []
         @name = null
 
     add: (word) ->
-        if word.full == @name?.full
-            if @words.length >= player.longest.length
-                player.longest = @words
-            @words = []
-        else if (index = @index(word))?
-            @words.pop(index)
-        else
-            @words.push(word)
-        if not @words.length
-            @name = null
-        else
+        word.reset()
+        @words.push(word)
+        if not @name?
             @name = new ShootingWord('@neizod')
 
-    get: (fullword) ->
-        for word, i in @words
-            if fullword == word.full
-                return @words[i]
+    remove: (word) ->
+        super
+        if not @words.length
+            @name = null
 
     get_name: (c) ->
         if c == @name?.remain[0]
             return @name
 
-    index: (find) ->
-        for word, i in @words
-            if word.full == find.full
-                return i
+    scoring: ->
+        score = 0
+        for word in @words
+            score += word.full.length
+        score * player.lvl
+
+    clear: ->
+        if @words.length >= player.longest.length
+            player.longest = @words
+        @name = null
+        @words = []
 
     show: ->
         sentence = @words.concat(if @name? then [@name] else [])
@@ -174,7 +198,7 @@ animate = new class
         fps.loop()
         pool.loop()
         $('#fps').html(fps.show())
-        $('#point').html(player.point)
+        $('#score').html(player.score)
         $('#keep').html(inventory.show())
         $('#playground').html(word.repr for word in pool.words)
         player.die = true if pool.attack()
@@ -196,20 +220,9 @@ $(document).keypress (event) ->
     c = String.fromCharCode(event.charCode)
     if not player.word?
         player.word = pool.get(c)
-    if not player.word?
-        player.word = inventory.get_name(c)
     if player.word?
         if player.word.full == player.word.remain
             player.pair = inventory.get(player.word.full)
-    player.word?.shot(c)
-    player.pair?.shot(c)
-    if player.word?.remain == ''
-        player.point += player.word.full.length
-        inventory.add(player.word)
-        pool.update()
-        player.word.reset()
-        player.word = null
-        player.lvl += 1
-        pool.autofill()
-    if player.pair?.remain == ''
-        player.pair = null
+    else
+        player.word = inventory.get_name(c)
+    player.shoot(c)
