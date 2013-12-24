@@ -185,12 +185,14 @@ animate = new class
         @id = setInterval(@loop, 12)
         $('#playground').css('background-color', 'lightblue')
 
+    pause: ->
+        @id = clearInterval(@id)
+
     stop: ->
-        clearInterval(@id)
+        @pause()
         $('#playground').css('background-color', 'darkred')
 
     reset: ->
-        @id = null
         for reinit_object in [player, inventory, pool]
             reinit_object.constructor()
 
@@ -212,7 +214,9 @@ $(document).keydown (event) ->
         if not animate.id?
             animate.start()
             pool.easter_egg()
-    if event.keyCode in [8, 27, 46] # backspace, escape, delete
+    if event.keyCode == 27 # escape
+        animate.pause()
+    if event.keyCode in [8, 46] # backspace, delete
         player.reset()
 
 
