@@ -185,9 +185,11 @@ animate = new class
         fps.constructor()
         @id = setInterval(@loop, 12)
         $('#playground').css('background-color', 'lightblue')
+        $('#menu').hide()
 
     pause: ->
         @id = clearInterval(@id)
+        $('#menu').show().css_center(stage_width)
 
     stop: ->
         @pause()
@@ -211,17 +213,19 @@ animate = new class
 
 
 $(document).keydown (event) ->
-    if event.keyCode == 13 # enter
-        if not animate.id?
+    if not animate.id?
+        if event.keyCode == 13 # enter
             animate.start()
             pool.easter_egg()
-    if event.keyCode == 27 # escape
-        animate.pause()
-    if event.keyCode in [8, 46] # backspace, delete
-        player.reset()
+    else
+        if event.keyCode == 27 # escape
+            animate.pause()
+        if event.keyCode in [8, 46] # backspace, delete
+            player.reset()
 
 
 $(document).keypress (event) ->
+    return if not animate.id?
     c = String.fromCharCode(event.charCode)
     if not player.word?
         player.word = pool.get(c)
@@ -231,3 +235,11 @@ $(document).keypress (event) ->
     else
         player.word = inventory.get_name(c)
     player.shoot(c)
+
+
+$(document).ready ->
+    $('#menu').show().css_center(stage_width)
+
+    $('#start').click ->
+        animate.start()
+        pool.easter_egg()
