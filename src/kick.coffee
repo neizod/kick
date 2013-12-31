@@ -239,7 +239,16 @@ $(document).keypress (event) ->
 
 $(document).ready ->
     $('#menu').show().css_center(stage_width)
+    $('#tutorial').hide()
 
     $('#start').click ->
         animate.start()
         pool.easter_egg()
+
+    $('#howto').click ->
+        $('#menu').hide()
+        $('#tutorial').show().css_center(stage_width)
+
+    $('#gotit').click ->
+        $('#tutorial').hide()
+        $('#menu').show().css_center(stage_width)
