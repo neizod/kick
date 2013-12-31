@@ -212,16 +212,25 @@ animate = new class
             @reset()
 
 
+bind_menu_hotkeys = (event) ->
+    hotkeys =
+        start: [13] # enter
+        howto: [72] # h
+        gotit: [13] # enter
+    for id, keys of hotkeys
+        button = $("##{id}")
+        if button.is(':visible') and event.keyCode in keys
+            return button.click()
+
+
 $(document).keydown (event) ->
-    if not animate.id?
-        if event.keyCode == 13 # enter
-            animate.start()
-            pool.easter_egg()
-    else
+    if animate.id?
         if event.keyCode == 27 # escape
             animate.pause()
         if event.keyCode in [8, 46] # backspace, delete
             player.reset()
+    else
+        bind_menu_hotkeys(event)
 
 
 $(document).keypress (event) ->
