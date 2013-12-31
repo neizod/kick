@@ -17,7 +17,7 @@ class ShootingWord
         @update()
 
     make_repr: ->
-        $('<div>').addClass('shooting-word')
+        $('<div>').addClass('absolute')
                   .css('top', @top)
                   .css('left', @left)
 
