@@ -1,8 +1,57 @@
-#playground {
+.relative {
     position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    top: 0;
+    height: 100%;
+}
+
+h1 {
+    margin: 0;
+    padding: 0.5em 0;
+}
+
+#main {
+    margin: auto;
+    padding: 0em 2em;
+    width: 1000px;
+    height: 100%;
+}
+
+#playground {
+    margin: auto;
     width: 1000px;
     height: 300px;
     background-color: lightblue;
+}
+
+#score {
+    text-align: right;
+    width: 100px;
+    right: 0;
+    bottom: 318px;
+}
+
+#fps {
+    left: 450px;
+    bottom: 318px;
+}
+
+#keep {
+    max-width: 800px;
+    top: 318px;
 }
 
 .shooting-word {

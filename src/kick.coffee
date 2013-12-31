@@ -1,5 +1,6 @@
 Array::pop = (index=@length-1) -> @splice(index, 1)[0]
 Array::random = -> @[Math.floor(@length * Math.random())]
+$::css_center = (max_width) -> @css('left', (max_width - @width()) / 2)
 
 stage_height = 300
 stage_width = 1000
@@ -199,9 +200,9 @@ animate = new class
     loop: =>
         fps.loop()
         pool.loop()
-        $('#fps').html(fps.show())
         $('#score').html(player.score)
-        $('#keep').html(inventory.show())
+        $('#keep').html(inventory.show()).css_center(stage_width)
+        $('#fps').html(fps.show()).css_center(stage_width)
         $('#playground').html(word.repr for word in pool.words)
         player.die = true if pool.attack()
         if player.die
