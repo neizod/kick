@@ -237,6 +237,8 @@ animate = new class
             @reset()
             @toggle_tools()
             $('#playground').css('background-color', 'darkred')
+            $('#start').html('play again!')
+            $('#menu').show().css_center(stage_width)
             # TODO $( game_summary ) whatever
 
     toggle_tools: ->
@@ -304,11 +306,10 @@ tutorial = new class
             if @step == @all_steps
                 console.log 'this is before end'
                 $('#start').show()
-                $('#gotit').show()
+                $('#howto').show()
                 $('#nextstep').hide()
         else
             $('#howto').show()
-            $('#gotit').hide()
             $('#nextstep').hide()
             $('#tutorial').hide()
         @sample[@step]()
@@ -316,11 +317,11 @@ tutorial = new class
 
 $(document).keydown (event) ->
     hotkeys =
-        erase: [8, 46] # backspace, delete
-        pause: [27] # esc
-        start: [13] # enter
-        howto: [72] # h
-        gotit: [13] # enter
+        erase:    [8, 46] # backspace, delete
+        pause:    [27] # esc
+        resume:   [13] # enter
+        howto:    [72] # h
+        nextstep: [72] # h
     for id, keys of hotkeys
         button = $("##{id}")
         clickable_button = button.is(':visible') and not button.is(':disabled')
@@ -343,7 +344,7 @@ $(document).keypress (event) ->
 
 $(document).ready ->
     animate.toggle_tools()
-    for pre_hidden in ['#gotit', '#nextstep', '#tutorial']
+    for pre_hidden in ['#nextstep', '#tutorial']
         $(pre_hidden).hide()
     $('#menu').show().css_center(stage_width)
 
@@ -354,7 +355,10 @@ $(document).ready ->
         $('#menu').hide()
         $('#playground').css('background-color', 'lightblue')
 
-    $('#howto, #nextstep, #gotit').click ->
+    $('#howto').click ->
+        tutorial.reset()
+
+    $('#howto, #nextstep').click ->
         tutorial.nextstep()
         $('#menu').show().css_center(stage_width)
 

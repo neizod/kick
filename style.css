@@ -101,6 +101,14 @@ h1 {
     top: 18px;
 }
 
+#menu button {
+    display: block;
+    margin:  9px;
+    width: 200px;
+    height: 30px;
+    text-align: center;
+}
+
 #tutorial {
     top: 18px;
 }
