@@ -50,6 +50,12 @@ h1 {
     background-color: lightblue;
 }
 
+#placeholder {
+    top:   0px;
+    right: 0px;
+    z-index: -1;
+}
+
 #player {
     width:  180px;
     height: 180px;

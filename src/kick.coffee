@@ -5,22 +5,19 @@ $::clear_pos = -> @css('left', '') and @css('top', '')
 
 stage_height = 300
 stage_width = 1000
-font_height = 18
 
 
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
         @speed = 180
-        @top = (stage_height - font_height) * Math.random()
-        @left = stage_width
-        @repr = @make_repr()
+        @repr = $('<div>').addClass('absolute')
         @update()
-
-    make_repr: ->
-        $('<div>').addClass('absolute')
-                  .css('top', @top)
-                  .css('left', @left)
+        $('#placeholder').html(@repr)
+        @top = (stage_height - @repr.height()) * Math.random()
+        @left = stage_width - @repr.width()
+        @repr.css('top', @top).css('left', @left)
+        $('#placeholder').empty()
 
     done: ->
         @full.slice(0, @full.length - @remain.length)
@@ -134,7 +131,6 @@ pool = new class extends WordKeeper
     constructor: ->
         @words = []
         @actions = ['box', 'kick', 'punch', 'strike']
-        @autofill()
 
     add: (word=@actions.random()) ->
         @words.push(new ShootingWord(word))
@@ -153,7 +149,7 @@ pool = new class extends WordKeeper
     clean: ->
         if player.word?.left <= 0
             player.word = null
-            player?.pair.reset()
+            player.pair?.reset()
         @words = @words.filter (word) -> word.left > 0
 
     easter_egg: (force=false) ->
@@ -205,6 +201,7 @@ animate = new class
 
     start: ->
         fps.constructor()
+        pool.autofill()
         @id = setInterval(@loop, 7)
         @toggle_tools()
 
