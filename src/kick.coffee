@@ -97,8 +97,19 @@ player = new class
             @word = null
             @pair = null
 
-    show: ->
-        'lives: ' + ('♥' for [0...Math.max(@lives, 0)]).join(' ')
+    show_lives: ->
+        if @lives > 3
+            'lives: ♥x' + @lives
+        else if @lives > 0
+            'lives: ' + ('♥' for [0...Math.max(@lives, 0)]).join('')
+        else
+            'lives: ☠'
+
+    show_lvl: ->
+        'level: ' + @lvl
+
+    show_score: ->
+        'score: ' + @score
 
 
 class WordKeeper
@@ -208,7 +219,8 @@ animate = new class
     loop: =>
         fps.loop()
         pool.loop()
-        $('#score').html(player.score)
+        $('#score').html(player.show_score())
+        $('#lvl').html(player.show_lvl())
         $('#keep').html(inventory.show()).css_center(stage_width)
         $('#fps').html(fps.show()).css_center(stage_width)
         $('#playground').html(word.repr for word in pool.words)
@@ -216,7 +228,7 @@ animate = new class
             player.lives -= damage
             pool.clean()
             pool.autofill()
-        $('#lives').html(player.show())
+        $('#lives').html(player.show_lives())
         if player.lives <= 0
             @stop()
             @reset()

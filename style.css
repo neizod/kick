@@ -6,6 +6,12 @@
     position: absolute;
 }
 
+.full-justify:after {
+    display: inline-block;
+    content: "";
+    width: 100%;
+}
+
 button.tool {
     margin:  9px;
     width:  70px;
@@ -48,6 +54,7 @@ h1 {
     height: 180px;
     top: 318px;
     left:  0px;
+    background-color: #ddd;
 }
 
 #boss {
@@ -62,17 +69,22 @@ h1 {
     width:  180px;
 }
 
-#lives {
+#lvl, #lives {
+    display: inline-block;
+    float:  left;
     padding: 9px;
-    width: 162px;
+    width:  72px;
     height: 27px;
+    text-align: justify;
 }
 
 #score {
-    text-align: right;
+    display: inline-block;
+    float:  left;
     padding: 9px;
     width: 162px;
     height: 27px;
+    text-align: justify;
 }
 
 #fps {
