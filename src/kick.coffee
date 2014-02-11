@@ -367,3 +367,5 @@ $(document).ready ->
 
     $('#pause').click ->
         animate.pause()
+        $('#playground').empty()
+        $('#keep').html('-- game pause --')
