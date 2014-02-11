@@ -104,3 +104,58 @@ h1 {
 #tutorial {
     top: 18px;
 }
+
+.bubble {
+    position: absolute;
+    width: 260px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    background-color: #fff;
+    border: 8px solid #666;
+    z-index: 3;
+}
+.bubble:before {
+    position: absolute;
+    content: ' ';
+    width:   0px;
+    height:  0px;
+    border: 20px solid;
+}
+.bubble:after {
+    position: absolute;
+    content: ' ';
+    width:   0px;
+    height:  0px;
+    border: 11px solid;
+}
+
+.bubble.right:before {
+    right: 10px;
+    top:   30px;
+    border-color: #666 #666 transparent transparent;
+}
+.bubble.right:after {
+    right: 16px;
+    top:   30px;
+    border-color: #fff #fff transparent transparent;
+}
+
+.bubble.left:before {
+    left:  10px;
+    top:   30px;
+    border-color: #666 transparent transparent #666;
+}
+.bubble.left:after {
+    left:  16px;
+    top:   30px;
+    border-color: #fff transparent transparent #fff;
+}
+
+#step-1 { left: 700px; top:  30px; display: none; }
+#step-2 { left: 100px; top:  30px; display: none; }
+#step-3 { left: 500px; top: 220px; display: none; }
+#step-4 { left:  30px; top: 220px; display: none; }
+
+#sample-1 { left: 940px; top: 130px; }
+#sample-2 { left: 110px; top: 130px; }

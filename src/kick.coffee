@@ -1,6 +1,7 @@
 Array::pop = (index=@length-1) -> @splice(index, 1)[0]
 Array::random = -> @[Math.floor(@length * Math.random())]
 $::css_center = (max_width) -> @css('left', (max_width - @width()) / 2)
+$::clear_pos = -> @css('left', '') and @css('top', '')
 
 stage_height = 300
 stage_width = 1000
@@ -155,8 +156,8 @@ pool = new class extends WordKeeper
             player?.pair.reset()
         @words = @words.filter (word) -> word.left > 0
 
-    easter_egg: ->
-        if animate.id == 1
+    easter_egg: (force=false) ->
+        if animate.id == 1 or force
             @words = []
             @add('kick')
 
@@ -249,6 +250,69 @@ animate = new class
             $('#erase').prop('disabled', true)
 
 
+tutorial = new class
+    constructor: ->
+        @step = 0
+        @all_steps = 4
+
+    reset: ->
+        while @step
+            @nextstep()
+
+    sample:
+        0: ->
+            animate.reset()
+            $('#score').html(player.show_score())
+            $('#lvl').html(player.show_lvl())
+        1: ->
+            pool.easter_egg(true)
+            player.word = pool.words[0]
+            player.word.repr.clear_pos().attr('id', 'sample-1')
+            $('#playground').html(player.word.repr)
+        2: ->
+            player.word.remain = player.word.full.slice(2)
+            player.word.update()
+            player.word.repr.clear_pos().attr('id', 'sample-2')
+            $('#playground').html(player.word.repr)
+        3: ->
+            player.word.remain = ''
+            player.shoot()
+            player.word = inventory.name
+            player.word.remain = player.word.full.slice(4)
+            player.word.update()
+            $('#playground').empty()
+            $('#keep').html(inventory.show()).css_center(stage_width)
+        4: ->
+            player.word.remain = ''
+            player.shoot()
+            $('#keep').empty()
+            $('#score').html(player.show_score())
+            $('#lvl').html(player.show_lvl())
+
+    nextstep: ->
+        if @step
+            $("#step-#{@step}").hide()
+        else
+            $('#howto').hide()
+            $('#start').hide()
+            $('#nextstep').show()
+            $('#tutorial').show()
+        @step += 1
+        @step %= @all_steps + 1
+        if @step
+            $("#step-#{@step}").show()
+            if @step == @all_steps
+                console.log 'this is before end'
+                $('#start').show()
+                $('#gotit').show()
+                $('#nextstep').hide()
+        else
+            $('#howto').show()
+            $('#gotit').hide()
+            $('#nextstep').hide()
+            $('#tutorial').hide()
+        @sample[@step]()
+
 
 $(document).keydown (event) ->
     hotkeys =
@@ -279,21 +343,19 @@ $(document).keypress (event) ->
 
 $(document).ready ->
     animate.toggle_tools()
+    for pre_hidden in ['#gotit', '#nextstep', '#tutorial']
+        $(pre_hidden).hide()
     $('#menu').show().css_center(stage_width)
-    $('#tutorial').hide()
 
     $('#start, #resume').click ->
+        tutorial.reset()
         animate.start()
         pool.easter_egg()
         $('#menu').hide()
         $('#playground').css('background-color', 'lightblue')
 
-    $('#howto').click ->
-        $('#menu').hide()
-        $('#tutorial').show().css_center(stage_width)
-
-    $('#gotit').click ->
-        $('#tutorial').hide()
+    $('#howto, #nextstep, #gotit').click ->
+        tutorial.nextstep()
         $('#menu').show().css_center(stage_width)
 
     $('#erase').click ->
@@ -301,4 +363,3 @@ $(document).ready ->
 
     $('#pause').click ->
         animate.pause()
-        $('#menu').show().css_center(stage_width)

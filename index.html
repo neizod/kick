@@ -26,17 +26,24 @@
           <img src="img/error.png" />
         </div>
         <div class="absolute" id="menu">
-          <button id="start">start game</button>
+          <button id="gotit">back to main menu</button>
           <button id="howto">how to play?</button>
+          <button id="nextstep">next step</button>
+          <button id="start">start game</button>
         </div>
         <div class="absolute" id="tutorial">
-          <h3>How to Play?</h3>
-          <ol>
-            <li>Type word, e.g. <b>kick</b>, that appear from right side.</li>
-            <li>Finish sentence with word <b>@neizod</b> to multiply score.</li>
-            <li>Try to stay alive by not letting any word arrive left side.</li>
-          </ol>
-          <button id="gotit">ok</button>
+          <div id="step-1" class="right bubble">
+            1. incoming words from right side.
+          </div>
+          <div id="step-2" class="left bubble">
+            2. type it before it reach left side.
+          </div>
+          <div id="step-3" class="left bubble">
+            3. type @name to finish the sentence.
+          </div>
+          <div id="step-4" class="left bubble">
+            4. score up and try to keep alive!
+          </div>
         </div>
       </div>
     </div>
