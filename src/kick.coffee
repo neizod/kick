@@ -87,19 +87,18 @@ player = new class
             pool.remove(@word)
             if @word.full == inventory.name?.full
                 @score += inventory.scoring()
+                @lvl = Math.floor(Math.log(Math.max(Math.E, @score)))
                 inventory.clear()
             else if not @pair?
                 inventory.add(@word)
             else
                 inventory.remove(@word)
             pool.autofill()
-            # TODO wise leveling ;)
-            @lvl += 1
             @word = null
             @pair = null
 
     show: ->
-        'lives: ' + ('♥' for [0...@lives]).join(' ')
+        'lives: ' + ('♥' for [0...Math.max(@lives, 0)]).join(' ')
 
 
 class WordKeeper
@@ -129,7 +128,7 @@ pool = new class extends WordKeeper
         @words.push(new ShootingWord(word))
 
     autofill: ->
-        for [1..player.lvl-@words.length]
+        for [0...Math.max(player.lvl-@words.length, 0)]
             @add()
 
     loop: ->
@@ -137,7 +136,7 @@ pool = new class extends WordKeeper
             word.move()
 
     attack: ->
-        @words.some (word) -> word.left <= 0
+        (@words.filter (word) -> word.left <= 0).length
 
     clean: ->
         @words = @words.filter (word) -> word.left > 0
@@ -168,12 +167,11 @@ inventory = new class extends WordKeeper
         if c == @name?.remain[0]
             return @name
 
-    # TODO craft wise algorithm ;)
     scoring: ->
         score = 0
-        for word in @words
-            score += word.full.length
-        score * player.lvl
+        for word, i in @words
+            score += word.full.length * Math.max(player.lvl-i, 1)
+        score
 
     clear: ->
         if @words.length >= player.longest.length
@@ -211,12 +209,12 @@ animate = new class
         $('#keep').html(inventory.show()).css_center(stage_width)
         $('#fps').html(fps.show()).css_center(stage_width)
         $('#playground').html(word.repr for word in pool.words)
-        #player.die = true if pool.attack()
-        if pool.attack()
+        if (damage = pool.attack())
+            player.lives -= damage
             pool.clean()
-            player.lives -= 1
+            pool.autofill()
         $('#lives').html(player.show())
-        if player.lives == 0
+        if player.lives <= 0
             @stop()
             @reset()
             $('#playground').css('background-color', 'darkred')
