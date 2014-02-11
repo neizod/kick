@@ -205,9 +205,11 @@ animate = new class
     start: ->
         fps.constructor()
         @id = setInterval(@loop, 7)
+        @toggle_tools()
 
     pause: ->
         @id = clearInterval(@id)
+        @toggle_tools()
 
     stop: ->
         @pause()
@@ -232,8 +234,20 @@ animate = new class
         if player.lives <= 0
             @stop()
             @reset()
+            @toggle_tools()
             $('#playground').css('background-color', 'darkred')
             # TODO $( game_summary ) whatever
+
+    toggle_tools: ->
+        if animate.id
+            $('#pause').show()
+            $('#resume').hide()
+            $('#erase').prop('disabled', false)
+        else
+            $('#pause').hide()
+            $('#resume').show()
+            $('#erase').prop('disabled', true)
+
 
 
 $(document).keydown (event) ->
@@ -245,7 +259,8 @@ $(document).keydown (event) ->
         gotit: [13] # enter
     for id, keys of hotkeys
         button = $("##{id}")
-        if button.is(':visible') and event.keyCode in keys
+        clickable_button = button.is(':visible') and not button.is(':disabled')
+        if clickable_button and event.keyCode in keys
             return button.click()
 
 
@@ -263,15 +278,14 @@ $(document).keypress (event) ->
 
 
 $(document).ready ->
+    animate.toggle_tools()
     $('#menu').show().css_center(stage_width)
-    $('.tool').hide()
     $('#tutorial').hide()
 
-    $('#start').click ->
+    $('#start, #resume').click ->
         animate.start()
         pool.easter_egg()
         $('#menu').hide()
-        $('.tool').show()
         $('#playground').css('background-color', 'lightblue')
 
     $('#howto').click ->
@@ -288,4 +302,3 @@ $(document).ready ->
     $('#pause').click ->
         animate.pause()
         $('#menu').show().css_center(stage_width)
-        $('.tool').hide()
