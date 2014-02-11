@@ -139,6 +139,9 @@ pool = new class extends WordKeeper
         (@words.filter (word) -> word.left <= 0).length
 
     clean: ->
+        if player.word?.left <= 0
+            player.word = null
+            player?.pair.reset()
         @words = @words.filter (word) -> word.left > 0
 
     easter_egg: ->
