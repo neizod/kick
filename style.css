@@ -6,6 +6,12 @@
     position: absolute;
 }
 
+button.tool {
+    margin:  9px;
+    width:  70px;
+    height: 70px;
+}
+
 html {
     margin: 0;
     padding: 0;
@@ -37,11 +43,36 @@ h1 {
     background-color: lightblue;
 }
 
+#player {
+    width:  180px;
+    height: 180px;
+    top: 318px;
+    left:  0px;
+}
+
+#boss {
+    width:  180px;
+    height: 180px;
+    top: 318px;
+    right: 0px;
+}
+
+#boss img {
+    height: 180px;
+    width:  180px;
+}
+
+#lives {
+    padding: 9px;
+    width: 162px;
+    height: 27px;
+}
+
 #score {
     text-align: right;
-    width: 100px;
-    right: 0;
-    bottom: 318px;
+    padding: 9px;
+    width: 162px;
+    height: 27px;
 }
 
 #fps {
@@ -50,7 +81,7 @@ h1 {
 }
 
 #keep {
-    max-width: 800px;
+    max-width: 604px;
     top: 318px;
 }
 

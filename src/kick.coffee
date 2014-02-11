@@ -10,7 +10,7 @@ font_height = 18
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
-        @speed = 80
+        @speed = 180
         @top = (stage_height - font_height) * Math.random()
         @left = stage_width
         @repr = @make_repr()
@@ -46,7 +46,7 @@ class ShootingWord
 
 fps = new class
     constructor: ->
-        @frames = 20
+        @frames = 60
         @actual = 0
         @time = 0
         @date = new Date()
@@ -68,6 +68,7 @@ fps = new class
 player = new class
     constructor: ->
         @lvl = 1
+        @lives = 3
         @score = 0
         @die = false
         @word = null
@@ -92,9 +93,13 @@ player = new class
             else
                 inventory.remove(@word)
             pool.autofill()
+            # TODO wise leveling ;)
             @lvl += 1
             @word = null
             @pair = null
+
+    show: ->
+        'lives: ' + ('♥' for [0...@lives]).join(' ')
 
 
 class WordKeeper
@@ -134,6 +139,9 @@ pool = new class extends WordKeeper
     attack: ->
         @words.some (word) -> word.left <= 0
 
+    clean: ->
+        @words = @words.filter (word) -> word.left > 0
+
     easter_egg: ->
         if animate.id == 1
             @words = []
@@ -160,6 +168,7 @@ inventory = new class extends WordKeeper
         if c == @name?.remain[0]
             return @name
 
+    # TODO craft wise algorithm ;)
     scoring: ->
         score = 0
         for word in @words
@@ -183,17 +192,13 @@ animate = new class
 
     start: ->
         fps.constructor()
-        @id = setInterval(@loop, 12)
-        $('#playground').css('background-color', 'lightblue')
-        $('#menu').hide()
+        @id = setInterval(@loop, 7)
 
     pause: ->
         @id = clearInterval(@id)
-        $('#menu').show().css_center(stage_width)
 
     stop: ->
         @pause()
-        $('#playground').css('background-color', 'darkred')
 
     reset: ->
         for reinit_object in [player, inventory, pool]
@@ -206,14 +211,22 @@ animate = new class
         $('#keep').html(inventory.show()).css_center(stage_width)
         $('#fps').html(fps.show()).css_center(stage_width)
         $('#playground').html(word.repr for word in pool.words)
-        player.die = true if pool.attack()
-        if player.die
+        #player.die = true if pool.attack()
+        if pool.attack()
+            pool.clean()
+            player.lives -= 1
+        $('#lives').html(player.show())
+        if player.lives == 0
             @stop()
             @reset()
+            $('#playground').css('background-color', 'darkred')
+            # TODO $( game_summary ) whatever
 
 
-bind_menu_hotkeys = (event) ->
+$(document).keydown (event) ->
     hotkeys =
+        erase: [8, 46] # backspace, delete
+        pause: [27] # esc
         start: [13] # enter
         howto: [72] # h
         gotit: [13] # enter
@@ -221,16 +234,6 @@ bind_menu_hotkeys = (event) ->
         button = $("##{id}")
         if button.is(':visible') and event.keyCode in keys
             return button.click()
-
-
-$(document).keydown (event) ->
-    if animate.id?
-        if event.keyCode == 27 # escape
-            animate.pause()
-        if event.keyCode in [8, 46] # backspace, delete
-            player.reset()
-    else
-        bind_menu_hotkeys(event)
 
 
 $(document).keypress (event) ->
@@ -248,11 +251,15 @@ $(document).keypress (event) ->
 
 $(document).ready ->
     $('#menu').show().css_center(stage_width)
+    $('.tool').hide()
     $('#tutorial').hide()
 
     $('#start').click ->
         animate.start()
         pool.easter_egg()
+        $('#menu').hide()
+        $('.tool').show()
+        $('#playground').css('background-color', 'lightblue')
 
     $('#howto').click ->
         $('#menu').hide()
@@ -261,3 +268,11 @@ $(document).ready ->
     $('#gotit').click ->
         $('#tutorial').hide()
         $('#menu').show().css_center(stage_width)
+
+    $('#erase').click ->
+        player.reset()
+
+    $('#pause').click ->
+        animate.pause()
+        $('#menu').show().css_center(stage_width)
+        $('.tool').hide()
