@@ -83,11 +83,11 @@ fps = new class
 boss = new class
     constructor: ->
         @status = 'normal'
-        @reset()
 
     reset: ->
+        @constructor()
         $('#boss').attr('class', 'absolute')
-                  .addClass('normal')
+                  .addClass(@status)
 
     sleep: ->
         $('#boss').removeClass(@status)

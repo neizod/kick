@@ -1,6 +1,5 @@
 main:
-	coffee -bc kick.coffee
-	mv kick.js ..
+	coffee -o .. -c kick.coffee
 
 clean:
 	rm -f ../kick.js
