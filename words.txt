@@ -1,0 +1,7 @@
+kick
+strike
+punch
+box
+kiss
+jab
+hook

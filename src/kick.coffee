@@ -130,7 +130,8 @@ class WordKeeper
 pool = new class extends WordKeeper
     constructor: ->
         @words = []
-        @actions = ['box', 'kick', 'punch', 'strike']
+
+    actions: null
 
     add: (word=@actions.random()) ->
         @words.push(new ShootingWord(word))
@@ -345,7 +346,13 @@ $(document).ready ->
         $(pre_hidden).hide()
     $('#menu').show().css_center(stage_width)
 
+    $.get 'words.txt', (data) ->
+        pool.actions = data.split('\n').filter (word) -> word.length
+
     $('#start, #resume').click ->
+        unless pool.actions
+            return $('#keep').html('-- file not ready, please try again. --')
+                             .css_center(stage_width)
         tutorial.reset()
         animate.start()
         pool.easter_egg()
