@@ -102,19 +102,22 @@ player = new class
             pool.remove(@word)
             if @word.full == inventory.name?.full
                 @score += inventory.scoring()
-                @lvl = Math.floor(Math.log(Math.max(Math.E, @score)))
                 inventory.clear()
             else if not @pair?
+                @score += 1
                 inventory.add(@word)
             else
                 inventory.remove(@word)
+            if @lvl < Math.floor(Math.log(Math.E + @score))
+                @lvl += 1
+                @lives += 1
             pool.autofill()
             @word = null
             @pair = null
 
     show_lives: ->
         if @lives > 3
-            'lives: ♥x' + @lives
+            'lives: ♥×' + @lives
         else if @lives > 0
             'lives: ' + ('♥' for [0...Math.max(@lives, 0)]).join('')
         else
