@@ -7,6 +7,19 @@ stage_height = 300
 stage_width = 1000
 
 
+tweet = (text) ->
+    url = 'http://neizod.github.io/kick'
+    $('#tweet').html $('<a>').addClass('twitter-share-button')
+                             .html('tweet')
+                             .attr('href', 'https://twitter.com/share')
+                             .attr('data-text', text)
+                             .attr('data-url', url)
+                             .attr('data-lang', 'en')
+                             .attr('data-count', 'vertical')
+                             .attr('data-counturl', url)
+    twttr.widgets.load()
+
+
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
@@ -108,6 +121,19 @@ player = new class
 
     show_score: ->
         'score: ' + @score
+
+    make_tweet: ->
+        unless @longest.length
+            return tweet('i got kicked by @neizod.')
+        url_preserve_length = 23
+        score = " @neizod and score #{@score}!"
+        quota = 140 - url_preserve_length - score.length
+        sentence = 'i'
+        for word in @longest
+            if sentence.length + 1 + word.full.length >= quota
+                break
+            sentence += ' ' + word.full
+        tweet(sentence + score)
 
 
 class WordKeeper
@@ -231,13 +257,13 @@ animate = new class
             pool.autofill()
         $('#lives').html(player.show_lives())
         if player.lives <= 0
+            player.make_tweet()
             @stop()
             @reset()
             @toggle_tools()
             $('#playground').css('background-color', 'darkred')
             $('#start').html('play again!')
             $('#menu').show().css_center(stage_width)
-            # TODO $( game_summary ) whatever
 
     toggle_tools: ->
         if animate.id
@@ -302,7 +328,6 @@ tutorial = new class
         if @step
             $("#step-#{@step}").show()
             if @step == @all_steps
-                console.log 'this is before end'
                 $('#start').show()
                 $('#howto').show()
                 $('#nextstep').hide()
@@ -372,4 +397,6 @@ $(document).ready ->
     $('#pause').click ->
         animate.pause()
         $('#playground').empty()
-        $('#keep').html('-- game pause --')
+        $('#keep').html('-- game pause --').css_center(stage_width)
+
+    tweet("let's play kick @neizod!")
