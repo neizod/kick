@@ -247,13 +247,19 @@ animate = new class
         for reinit_object in [player, inventory, pool]
             reinit_object.constructor()
 
+    alive: ->
+        $('#playground').removeClass('dead').addClass('alive')
+
+    dead: ->
+        $('#playground').removeClass('alive').addClass('dead')
+
     loop: =>
         fps.loop()
         pool.loop()
         $('#score').html(player.show_score())
         $('#lvl').html(player.show_lvl())
         $('#keep').html(inventory.show()).css_center(stage_width)
-        $('#fps').html(fps.show()).css_center(stage_width)
+        $('#fps').html(fps.show())
         $('#playground').html(word.repr for word in pool.words)
         if (damage = pool.attack())
             player.lives -= damage
@@ -265,7 +271,7 @@ animate = new class
             @stop()
             @reset()
             @toggle_tools()
-            $('#playground').css('background-color', 'darkred')
+            @dead()
             $('#start').html('play again!')
             $('#menu').show().css_center(stage_width)
 
@@ -330,7 +336,7 @@ tutorial = new class
             $('.social').hide()
             $('#nextstep').show()
             $('#tutorial').show()
-            $('#playground').css('background-color', 'lightblue')
+            animate.alive()
         @step += 1
         @step %= @all_steps + 1
         if @step
@@ -353,6 +359,7 @@ $(document).keydown (event) ->
         howto:    [27] # esc
         erase:    [8, 46] # backspace, delete
         pause:    [27] # esc
+        start:    [13] # enter
         resume:   [13, 27] # enter, esc
     for id, keys of hotkeys
         button = $("##{id}")
@@ -378,20 +385,23 @@ $(document).ready ->
     animate.toggle_tools()
     for pre_hidden in ['#nextstep', '#tutorial']
         $(pre_hidden).hide()
+    animate.alive()
     $('#menu').show().css_center(stage_width)
 
     $.get 'words.txt', (data) ->
         pool.actions = data.split('\n').filter (word) -> word.length
 
+    $('#start').click ->
+        tutorial.reset()
+
     $('#start, #resume').click ->
         unless pool.actions
             return $('#keep').html('-- file not ready, please try again. --')
                              .css_center(stage_width)
-        tutorial.reset()
         animate.start()
         pool.easter_egg()
         $('#menu').hide()
-        $('#playground').css('background-color', 'lightblue')
+        animate.alive()
 
     $('#howto').click ->
         tutorial.reset()
