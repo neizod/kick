@@ -17,7 +17,7 @@ tweet = (text) ->
                              .attr('data-lang', 'en')
                              .attr('data-count', 'vertical')
                              .attr('data-counturl', url)
-    twttr.widgets.load()
+    twttr?.widgets.load()
 
 
 class ShootingWord
@@ -321,8 +321,10 @@ tutorial = new class
         else
             $('#howto').hide()
             $('#start').hide()
+            $('.social').hide()
             $('#nextstep').show()
             $('#tutorial').show()
+            $('#playground').css('background-color', 'lightblue')
         @step += 1
         @step %= @all_steps + 1
         if @step
@@ -330,6 +332,7 @@ tutorial = new class
             if @step == @all_steps
                 $('#start').show()
                 $('#howto').show()
+                $('.social').show()
                 $('#nextstep').hide()
         else
             $('#howto').show()
@@ -340,11 +343,11 @@ tutorial = new class
 
 $(document).keydown (event) ->
     hotkeys =
+        nextstep: [13, 72] # enter, h
         erase:    [8, 46] # backspace, delete
         pause:    [27] # esc
         resume:   [13] # enter
         howto:    [72] # h
-        nextstep: [72] # h
     for id, keys of hotkeys
         button = $("##{id}")
         clickable_button = button.is(':visible') and not button.is(':disabled')

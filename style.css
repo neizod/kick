@@ -117,6 +117,12 @@ h1 {
     text-align: center;
 }
 
+.social {
+    display: inline-block;
+    vertical-align: top;
+    margin: 9px;
+}
+
 #tutorial {
     top: 18px;
 }
