@@ -1,5 +1,5 @@
-http://bg.siteorigin.com/
-=========================
+background <http://bg.siteorigin.com/>
+======================================
 
 main background
 ---------------

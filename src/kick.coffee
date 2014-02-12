@@ -80,6 +80,33 @@ fps = new class
         @rate().toFixed(1) + ' fps'
 
 
+boss = new class
+    constructor: ->
+        @status = 'normal'
+        @reset()
+
+    reset: ->
+        $('#boss').attr('class', 'absolute')
+                  .addClass('normal')
+
+    sleep: ->
+        $('#boss').removeClass(@status)
+                  .addClass('sleep')
+
+    awake: ->
+        $('#boss').removeClass('sleep')
+                  .addClass(@status)
+
+    update: (lvl=player.lvl) ->
+        $('#boss').removeClass(@status)
+        if lvl > 7
+            @status = 'tear'
+        else
+            @status = [ 'love', 'normal', 'ennui', 'curious',
+                        'exclaim', 'angry', 'wtf', 'wth',   ][lvl]
+        $('#boss').addClass(@status)
+
+
 player = new class
     constructor: ->
         @lvl = 1
@@ -111,6 +138,7 @@ player = new class
             if @lvl < Math.floor(Math.log(Math.E + @score))
                 @lvl += 1
                 @lives += 1
+                boss.update()
             pool.autofill()
             @word = null
             @pair = null
@@ -276,6 +304,8 @@ animate = new class
             pool.autofill()
         $('#lives').html(player.show_lives())
         if player.lives <= 0
+            if player.score == 0
+                boss.update(0)
             player.make_summary()
             @stop()
             @reset()
@@ -395,6 +425,7 @@ $(document).ready ->
     for pre_hidden in ['#nextstep', '#tutorial', '#summary']
         $(pre_hidden).hide()
     animate.alive()
+    boss.reset()
     $('#menu').show().css_center(stage_width)
 
     $.get 'words.txt', (data) ->
@@ -402,6 +433,7 @@ $(document).ready ->
 
     $('#start').click ->
         tutorial.reset()
+        boss.reset()
         $('#summary').hide()
 
     $('#start, #resume').click ->
@@ -409,12 +441,14 @@ $(document).ready ->
             return $('#keep').html('-- file not ready, please try again. --')
                              .css_center(stage_width)
         animate.start()
+        boss.awake()
         pool.easter_egg()
         $('#menu').hide()
         animate.alive()
 
     $('#howto').click ->
         tutorial.reset()
+        boss.reset()
 
     $('#howto, #nextstep').click ->
         tutorial.nextstep()
@@ -425,6 +459,7 @@ $(document).ready ->
 
     $('#pause').click ->
         animate.pause()
+        boss.sleep()
         $('#playground').empty()
         $('#keep').html('-- game pause --').css_center(stage_width)
 

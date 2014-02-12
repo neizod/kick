@@ -23,7 +23,7 @@ html {
     margin: 0;
     padding: 0;
     height: 100%;
-    background-image: url('img/bg-main.png');
+    background-image: url(img/bg-main.png);
 }
 
 body {
@@ -51,12 +51,12 @@ h1 {
 }
 
 #playground.alive {
-    background-image: url('img/bg-alive.png');
+    background-image: url(img/bg-alive.png);
     background-color: #6cc;
     color: #000;
 }
 #playground.dead {
-    background-image: url('img/bg-dead.png');
+    background-image: url(img/bg-dead.png);
     background-color: #c66;
     color: #555;
 }
@@ -83,6 +83,17 @@ h1 {
     right: 0px;
     border: 3px solid #666;
 }
+
+#boss.sleep   { background-image: url(img/nc-sleep.png);   }
+#boss.love    { background-image: url(img/nc-love.png);    }
+#boss.normal  { background-image: url(img/nc-normal.png);  }
+#boss.ennui   { background-image: url(img/nc-ennui.png);   }
+#boss.curious { background-image: url(img/nc-curious.png); }
+#boss.exclaim { background-image: url(img/nc-exclaim.png); }
+#boss.angry   { background-image: url(img/nc-angry.png);   }
+#boss.wtf     { background-image: url(img/nc-wtf.png);     }
+#boss.wth     { background-image: url(img/nc-wth.png);     }
+#boss.tear    { background-image: url(img/nc-tear.png);    }
 
 #boss img {
     height: 180px;
@@ -152,14 +163,14 @@ h1 {
 }
 .bubble:before {
     position: absolute;
-    content: ' ';
+    content: " ";
     width:   0px;
     height:  0px;
     border: 20px solid;
 }
 .bubble:after {
     position: absolute;
-    content: ' ';
+    content: " ";
     width:   0px;
     height:  0px;
     border: 11px solid;
