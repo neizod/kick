@@ -23,7 +23,11 @@ tweet = (text) ->
 class ShootingWord
     constructor: (@full) ->
         @remain = @full
-        @speed = 180
+        @speed = 110
+        if player.lvl < 10
+            @speed += player.lvl * (25 - player.lvl) / 2
+        else
+            @speed += player.lvl * 4 + 36
         @repr = $('<div>').addClass('absolute')
         @update()
         $('#placeholder').html(@repr)
@@ -284,12 +288,14 @@ tutorial = new class
     reset: ->
         while @step
             @nextstep()
+        @sample[0]()
 
     sample:
         0: ->
             animate.reset()
             $('#score').html(player.show_score())
             $('#lvl').html(player.show_lvl())
+            $('#lives').html(player.show_lives())
         1: ->
             pool.easter_egg(true)
             player.word = pool.words[0]
@@ -343,11 +349,11 @@ tutorial = new class
 
 $(document).keydown (event) ->
     hotkeys =
-        nextstep: [13, 72] # enter, h
+        nextstep: [13, 27] # enter, esc
+        howto:    [27] # esc
         erase:    [8, 46] # backspace, delete
         pause:    [27] # esc
-        resume:   [13] # enter
-        howto:    [72] # h
+        resume:   [13, 27] # enter, esc
     for id, keys of hotkeys
         button = $("##{id}")
         clickable_button = button.is(':visible') and not button.is(':disabled')
