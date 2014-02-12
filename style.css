@@ -53,10 +53,12 @@ h1 {
 #playground.alive {
     background-image: url('img/bg-alive.png');
     background-color: #6cc;
+    color: #000;
 }
 #playground.dead {
     background-image: url('img/bg-dead.png');
     background-color: #c66;
+    color: #555;
 }
 
 #placeholder {

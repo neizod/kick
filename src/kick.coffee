@@ -129,6 +129,12 @@ player = new class
     show_score: ->
         'score: ' + @score
 
+    make_summary: ->
+        @make_tweet()
+        $('#summary').html("<p>game over, your score is <u>#{@score}</u>.</p>")
+                     .append('<p>click below to tweet your score!</p>')
+                     .show()
+
     make_tweet: ->
         unless @longest.length
             return tweet('i got kicked by @neizod.')
@@ -270,7 +276,7 @@ animate = new class
             pool.autofill()
         $('#lives').html(player.show_lives())
         if player.lives <= 0
-            player.make_tweet()
+            player.make_summary()
             @stop()
             @reset()
             @toggle_tools()
@@ -386,7 +392,7 @@ $(document).keypress (event) ->
 
 $(document).ready ->
     animate.toggle_tools()
-    for pre_hidden in ['#nextstep', '#tutorial']
+    for pre_hidden in ['#nextstep', '#tutorial', '#summary']
         $(pre_hidden).hide()
     animate.alive()
     $('#menu').show().css_center(stage_width)
@@ -396,6 +402,7 @@ $(document).ready ->
 
     $('#start').click ->
         tutorial.reset()
+        $('#summary').hide()
 
     $('#start, #resume').click ->
         unless pool.actions
