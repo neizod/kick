@@ -38,10 +38,18 @@ h1 {
 }
 
 #main {
-    margin: auto;
+    margin: 0 auto -24px;
     padding: 0em 2em;
     width: 1000px;
+    min-height: 100%;
+    height: auto !important;
     height: 100%;
+}
+
+#footer, #push-foot {
+    height: 24px;
+    text-align: center;
+    color: #333;
 }
 
 #playground {
