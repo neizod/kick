@@ -112,7 +112,6 @@ player = new class
         @lvl = 1
         @lives = 3
         @score = 0
-        @die = false
         @word = null
         @pair = null
         @longest = []
@@ -449,6 +448,7 @@ $(document).ready ->
     $('#howto').click ->
         tutorial.reset()
         boss.reset()
+        $('#summary').hide()
 
     $('#howto, #nextstep').click ->
         tutorial.nextstep()
