@@ -25,6 +25,6 @@ default
   - pads:    #ff9999
   - paws:    #362e2b
   - extra:   default, default
-  - bg:      #ffd694, default [7,2]
+  - bg:      #ffd694, 00e699 [7,2]
 
 alway saves as png at 180px
