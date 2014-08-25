@@ -406,7 +406,7 @@ $(document).keydown (event) ->
         button = $("##{id}")
         clickable_button = button.is(':visible') and not button.is(':disabled')
         if clickable_button and event.keyCode in keys
-            return button.click()
+            return button.click() and false
 
 
 $(document).keypress (event) ->
