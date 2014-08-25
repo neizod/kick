@@ -1,6 +1,7 @@
+SHELL = /bin/bash
+
 main:
-	coffee -o .. -c kick.coffee
-	python3 -m jsmin ../kick.js > ../kick.min.js
+	coffee -cs < <(tail -n +4 kick.coffee) > kick.js
 
 clean:
-	rm -f ../kick.js ../kick.min.js
+	rm -f kick.js

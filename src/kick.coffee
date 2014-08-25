@@ -1,3 +1,6 @@
+---
+---
+
 Array::pop = (index=@length-1) -> @splice(index, 1)[0]
 Array::random = -> @[Math.floor(@length * Math.random())]
 $::css_center = (max_width) -> @css('left', (max_width - @width()) / 2)
