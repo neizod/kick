@@ -11,10 +11,10 @@ stage_width = 1000
 
 
 tweet = (text) ->
-    url = 'http://neizod.github.io/kick'
+    url = '//neizod.github.io/kick'
     $('#tweet').html $('<a>').addClass('twitter-share-button')
                              .html('tweet')
-                             .attr('href', 'https://twitter.com/share')
+                             .attr('href', '//twitter.com/share')
                              .attr('data-text', text)
                              .attr('data-url', url)
                              .attr('data-lang', 'en')
