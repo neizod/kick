@@ -80,7 +80,7 @@ fps = new class
         1000 / @time
 
     show: ->
-        @rate().toFixed(1) + ' fps'
+        "#{@rate().toFixed(1)} fps"
 
 
 boss = new class
@@ -147,17 +147,17 @@ player = new class
 
     show_lives: ->
         if @lives > 3
-            'lives: ♥×' + @lives
+            "lives: ♥× #{@lives}"
         else if @lives > 0
-            'lives: ' + ('♥' for [0...Math.max(@lives, 0)]).join('')
+            "lives: #{('♥' for [0...Math.max(@lives, 0)]).join('')}"
         else
             'lives: ☠'
 
     show_lvl: ->
-        'level: ' + @lvl
+        "level: #{@lvl}"
 
     show_score: ->
-        'score: ' + @score
+        "score: #{@score}"
 
     make_summary: ->
         @make_tweet()
