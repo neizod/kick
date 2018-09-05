@@ -52,10 +52,8 @@ class ShootingWord
         @repr.css('left', @left)
 
     update: ->
-        if @remain == @full
-            @repr.html($('<b>').html(@full))
-        else
-            @repr.html([$('<u>').html(@done()), $('<b>').html(@remain)])
+        @repr.html([ $('<u>').html(@done().toUpperCase()),
+                     $('<b>').html(@remain.toUpperCase()) ])
 
     reset: ->
         @remain = @full
