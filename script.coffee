@@ -31,7 +31,7 @@ class ShootingWord
             @speed += player.lvl * (25 - player.lvl) / 2
         else
             @speed += player.lvl * 4 + 36
-        @repr = $('<div>').addClass('absolute')
+        @repr = $('<div>').addClass('absolute').addClass('shooting-word')
         @update()
         $('#placeholder').html(@repr)
         @top = (stage_height - @repr.height()) * Math.random()
