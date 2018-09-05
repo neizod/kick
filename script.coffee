@@ -12,14 +12,14 @@ stage_width = 1000
 
 tweet = (text) ->
     url = '//neizod.github.io/kick'
-    $('#tweet').html $('<a>').addClass('twitter-share-button')
-                             .html('tweet')
-                             .attr('href', '//twitter.com/share')
-                             .attr('data-text', text)
-                             .attr('data-url', url)
-                             .attr('data-lang', 'en')
-                             .attr('data-count', 'vertical')
-                             .attr('data-counturl', url)
+    link = $('<a>').addClass('twitter-share-button')
+                   .html('tweet')
+                   .attr('href', 'https://twitter.com/share?ref_src=twsrc%5Etfw')
+                   .attr('data-text', text)
+                   .attr('data-url', url)
+                   .attr('data-related', 'neizod')
+                   .attr('data-show-count', 'false')
+    $('#tweet').html(link)
     twttr?.widgets.load()
 
 
